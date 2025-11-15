@@ -22,8 +22,6 @@ df = pd.read_csv('data_set.csv')
 
 
 
-
-
 #1)
 # returns true or false if that rows occupation contains 'Likes'
 likes_occ = df['Occupation'].str.contains("Likes" ,case = False)
@@ -48,10 +46,3 @@ df['Category'] = df['Job'].apply(lambda x: 'STEM' if 'Engineer' in x else 'Other
 print(df)
 
 df.to_csv("data_set.csv")
-
-
-
-
-
-
-
