@@ -7,7 +7,7 @@ import pandas as pd
 
 # df -> data frame
 
-df = pd.read_csv('data_set.csv')
+df = pd.read_csv("data_set.csv")
 
 
 
@@ -20,19 +20,17 @@ df = pd.read_csv('data_set.csv')
 # otherwise → "Other".
 # Print the updated dataframe.
 
-
-
-
-
 #1)
 # returns true or false if that rows occupation contains 'Likes'
 likes_occ = df['Occupation'].str.contains("Likes" ,case = False)
+
+
+
 #prints the names of values that are true.
 print(df.loc[likes_occ,'Name'])
 
 
 #2)
-
 # Gets the sum of engineering jobs in the dataset. 
 engineer_count = df['Job'].str.contains("Engineer", case = False).sum()
 print(f'The sum of jobs with Engineering is: {engineer_count}')
@@ -40,18 +38,13 @@ print(f'The sum of jobs with Engineering is: {engineer_count}')
 
 #3)
 # creating a new column for my dataFrame
-
 # made the catgeories the same because category is based of job but applied the function lambda
 # which: STEM if 'Engineer' is in x else Other.
 df['Category'] = df['Job'].apply(lambda x: 'STEM' if 'Engineer' in x else 'Other')
 
 print(df)
 
-df.to_csv("data_set.csv")
-
-
-
-
+# Start implementation of BASELINE 
 
 
 
