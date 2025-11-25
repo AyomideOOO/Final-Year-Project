@@ -43,7 +43,7 @@ Y = vectorizer.transform([user_input])
 
 
 # Apply Cosine Similarity
-similarity_scores = cosine_similarity(Y,X)
+similarity_scores = cosine_similarity(X,Y)
 print(similarity_scores)
 
 
