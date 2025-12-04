@@ -134,4 +134,5 @@ real_dataset.combine_relevant_fields(relevant, 'relevant_fields.csv')
 real_dataset.top_recommendations(3)
 
 
-
+# byte-encoder scoring
+# text encoders for context - BERT, berta
