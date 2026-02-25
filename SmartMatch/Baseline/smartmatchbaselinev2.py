@@ -24,6 +24,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 import matplotlib.pyplot as plt
 
 
+
+# time used for working out run-time
+import time 
+
+
 class SmartMatchBaseline:
 
     # Constructor: initializes the SmartMatchBaseline object
@@ -33,7 +38,9 @@ class SmartMatchBaseline:
     # Y: TF-IDF vector of the user query
 
     def __init__(self):
-        self.df = None
+
+        self.vectorizer = TfidfVectorizer()
+        self.df = pd.DataFrame()
         self.X = None
         self.Y = None
         self.pf = None
@@ -74,48 +81,47 @@ class SmartMatchBaseline:
         self.pf.to_csv(my_csv, index= False)
 
 
-    def convert_to_vectors(self):
+    def convert_to_vector(self):
 
         # vectorizes the column 'Relevant_Fields' in dataframe 'pf' using TF-IDF
-        vectorizer = TfidfVectorizer()
-        self.X = vectorizer.fit_transform(self.pf['Relevant_Fields'])
+        self.X = self.vectorizer.fit_transform(self.pf['Relevant_Fields'])
 
-        # ask the user for what placement they are looking for 
-        user_input = input("Enter the type of role you are looking for: ")
+        return self.X
+    
+
+    
+    def user_vector(self, user_input):
 
         # vectorize the user input
-        self.Y = vectorizer.transform([user_input])
+        self.Y = self.vectorizer.transform([user_input])
 
-        return self.X, self.Y
+        return self.Y
+        
     
 
     # NEED TO REWRITE COMMENT HERE ON A LATER DAY
 
-
-
-    def similarity_score(self):
-       X, Y = self.convert_to_vectors()
+    def similarity_score(self, X, Y):
        similarity_score = cosine_similarity(X,Y)
-    
        return similarity_score
     
 
-    def top_recommendations(self,k):
+    def top_recommendations(self,k, similarity_scores):
 
         # flatten converts multi-dimensional array into a 1-D array
-        similarity_score = self.similarity_score().flatten()
+        scores = similarity_scores.flatten()
 
         # argsort sorts the indexes of highest values to lowest values in asending order (highest -> list[len(list-1)]) 
         # (lowest -> list[0])
 
-        k_best = np.argsort(similarity_score)[-k:][::-1]
+        k_best = np.argsort(scores)[-k:][::-1]
 
         n = len(k_best)
 
         for i in range(n):
             index = k_best[i]
             print(f" {i+1}) {self.df['title'][index]} \n\n {self.df['description'][index]} \n\n")
-        
+    
      
     # next session: Use hash-map to combine indexes with their respective cosine_similarity values
     # make a graph and plot the x axis -> the cosine similarities + role names, y axis -> 0 -to 1. 
@@ -129,18 +135,56 @@ class SmartMatchBaseline:
         print(best)
       
 
-# New instance of baseline model.
+
+# Preprocessing      
 real_dataset = SmartMatchBaseline()
-real_dataset.readcsv('postings.csv')
+running = True 
+start = 0
+
+while len(real_dataset.df) == 0:
+    start = time.time()
+    
+    real_dataset.readcsv('Data/postings.csv')
+
+    # get all the relevant fields together into new dataframe
+    relevant_columns = ['title', 'location', 'skills_desc', 'description']
+    real_dataset.combine_relevant_fields(relevant_columns, 'Data/relevant_fields.csv')
+    
+    
+
+# Vectorizes the dataframe (pf)
+X = real_dataset.convert_to_vector()
+
+# calculating preprocessing time 
+end = time.time()
+Preprocessing_duration = end - start 
+print(f'Elapsed time of preprocessing: {Preprocessing_duration}')
 
 
-# get all the relevant fields together into new dataframe
-relevant_columns= ['title', 'location', 'skills_desc', 'description']
-real_dataset.combine_relevant_fields(relevant_columns, 'relevant_fields.csv')
+
+# Processing
+# Cosine Similarity + Top K recommendations
+while running: 
+
+   # ask the user for what role they are looking for 
+    user_input = input("Enter the type of role you are looking for: ")
+    Y = real_dataset.user_vector(user_input)
+    Similarity_Scores = real_dataset.similarity_score(X,Y)
+    real_dataset.top_recommendations(3,Similarity_Scores)
+    user_input = input("Enter (Y) to find another role, Enter (N) to stop: ").lower()
+    if user_input == 'Y'.lower():
+       running = True
+    elif user_input == 'N'.lower():
+        print("End. ")
+        running = False
+
+        
+        
 
 
-# TF-IDF and Cosine Similarity + Top K recommendations
-real_dataset.top_recommendations(3)
+
+
+
 
 
 
