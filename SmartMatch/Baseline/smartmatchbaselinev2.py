@@ -92,6 +92,7 @@ class SmartMatchBaseline:
     # NEED TO REWRITE COMMENT HERE ON A LATER DAY
 
 
+
     def similarity_score(self):
        X, Y = self.convert_to_vectors()
        similarity_score = cosine_similarity(X,Y)
@@ -143,10 +144,9 @@ real_dataset.combine_relevant_fields(relevant_columns, 'relevant_fields.csv')
 real_dataset.top_recommendations(3)
 
 
-# byte-encoder scoring
-# text encoders for context - BERT, berta
-
-
+#test = SmartMatchBaseline()
+#test.readcsv('postings.csv')
+#print(test.df.shape)
 
 
 # Things to do later (written 8/12/20205) 
