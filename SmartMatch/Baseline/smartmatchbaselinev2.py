@@ -106,7 +106,7 @@ class SmartMatchBaseline:
         similarity_score = self.similarity_score().flatten()
 
         # argsort sorts the indexes of highest values to lowest values in asending order (highest -> list[len(list-1)]) 
-        # (lowest - list[0])
+        # (lowest -> list[0])
 
         k_best = np.argsort(similarity_score)[-k:][::-1]
 
@@ -116,7 +116,7 @@ class SmartMatchBaseline:
             index = k_best[i]
             print(f" {i+1}) {self.df['title'][index]} \n\n {self.df['description'][index]} \n\n")
         
-    
+     
     # next session: Use hash-map to combine indexes with their respective cosine_similarity values
     # make a graph and plot the x axis -> the cosine similarities + role names, y axis -> 0 -to 1. 
     # this would show the relationship in the similarity and why certain roles showed in top k recommendations
@@ -128,7 +128,6 @@ class SmartMatchBaseline:
 
         print(best)
       
-
 
 # New instance of baseline model.
 real_dataset = SmartMatchBaseline()
@@ -144,12 +143,8 @@ real_dataset.combine_relevant_fields(relevant_columns, 'relevant_fields.csv')
 real_dataset.top_recommendations(3)
 
 
-#test = SmartMatchBaseline()
-#test.readcsv('postings.csv')
-#print(test.df.shape)
 
-
-# Things to do later (written 8/12/20205) 
+# Things to do later (written 8/12/2025) 
 # - Measure execution time of the algorithm
 # - Add byte-encoder scoring for semantic reasoning (BERT, berta etc.)
 # - Experiment with dataset size for optimal performance (quote in report)
