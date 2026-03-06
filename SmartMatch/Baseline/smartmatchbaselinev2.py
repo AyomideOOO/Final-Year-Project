@@ -4,7 +4,6 @@
 # Pandas used for storing csvs as dataframes: df, pf 
 import pandas as pd
 
-
 # K - integer
 # numpy used to get the Top K recommended roles 
 import numpy as np
@@ -14,24 +13,21 @@ import numpy as np
 # and the 'relevant fields' dataframe.
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-
 # Implemented to calculate the similarity scores between the 
 # relevant fields and the user input (vectorized)
-
 from sklearn.metrics.pairwise import cosine_similarity
-
 
 # matplotlib used for plotting graphs to visualise similarity scores and role names
 import matplotlib.pyplot as plt
 
-
-
 # time used for working out run-time
 import time 
 
-
 # streamlit used for the user interface
 import streamlit as st 
+
+# pdfplumber used for reading users cv into python for processing
+import pdfplumber
 
 
 class SmartMatchBaseline:
@@ -72,14 +68,13 @@ class SmartMatchBaseline:
         # this is to prevent data loss from concatinating rows. 
 
         # Store the first relevant column from 'df' into 'pf', converting text to lowercase
-        self.pf['Relevant_Fields'] = self.df[relevant_columns[0]].fillna("").str.lower()
+        self.pf['Relevant_Fields'] = self.df[relevant_columns[0]].fillna('').str.lower()
 
         
         # For loop stores the remaining relevant columns from 'df' into 'pf' 
         # concatenating each column value with a comma.
-
         for i in range(1,len(relevant_columns)):
-            self.pf['Relevant_Fields'] += ", " + self.df[relevant_columns[i]].fillna("").str.lower() 
+            self.pf['Relevant_Fields'] += ", " + self.df[relevant_columns[i]].fillna('').str.lower() 
 
           
 
@@ -129,11 +124,27 @@ class SmartMatchBaseline:
 
     
 
+
+# Function prompts user to input their CV
+# CV is read into python as a pdf, where the text is extracted and returned. 
+
+def upload_file():
+    text = ""
+    uploaded_file = st.file_uploader("Upload your CV for personalised job recommendations", type = ['pdf', 'docx'] ) 
+    if uploaded_file is not None:
+        with pdfplumber.open(uploaded_file) as pdf:
+            pages = pdf.pages[0]
+            text = pages.extract_text()
+            text = text.lower()
+            st.success(f'Successfully Uploaded file: {uploaded_file.name}')
+        return text
+
+
 # Caches preprocessing (data loading, feature extraction, TF-IDF fitting) to
 # avoid recomputation, reducing execution time. 
-
 @st.cache_data
 def start_program():
+
     dataset = SmartMatchBaseline()
     st.title("SmartMatch")
 
@@ -145,21 +156,37 @@ def start_program():
     return X, dataset
 
 
+
 def processing(X, dataset, k):
 
-    # User enters the type of role they are looking for 
-    user_input = st.text_input("Enter the type of role you are looking for: ")
+    # Store cv data in user_cv
+    user_cv = upload_file()
 
-    if user_input != "":
-        
-        # User query is vectorized using TF-IDF
-        Y = dataset.user_vector(user_input)
-    
-        # Similarity scores between user query and job postings computed using cosine similarity 
+    # Processing can continue if the user uploads their CV. 
+    if user_cv is not None:
+
+        # Vectorize the user cv using TF-IDF 
+        Y = dataset.user_vector(user_cv)
+
+        # Similarity scores between user query and job postings computed using cosine similarity
         Similarity_Scores = dataset.similarity_score(X,Y)
 
         # Top K job recommendations retrieved and outputted to user. 
         dataset.top_recommendations(k,Similarity_Scores)
+
+    # User enters the type of role they are looking for 
+    # user_input = st.text_input("Enter the type of role you are looking for: ")
+
+    #if user_input != "":
+        
+        # User query is vectorized using TF-IDF
+        # Y = dataset.user_vector(user_input)
+    
+         
+        # Similarity_Scores = dataset.similarity_score(X,Y)
+
+        # Top K job recommendations retrieved and outputted to user. 
+        # dataset.top_recommendations(k,Similarity_Scores)
 
 
 ####   Preprocessing   ####
@@ -179,17 +206,12 @@ print(f'Elapsed time of preprocessing: {Preprocessing_duration}')
 processing(X, dataset, 3)
 
 
+####   End of Execution   ####
+
+
 # Things to do later (written 8/12/2025) 
 # - Measure execution time of the algorithm (done for preprocesing for performance testing on streamlit)
 # - Add byte-encoder scoring for semantic reasoning (BERT, berta etc.)
 # - Experiment with dataset size for optimal performance (quote in report)
 # - Randomize dataset before sampling top 300 rows if >75,000 entries
 # - For data cleaning, drop roles with NaN values instead of filling the spaces (.fillna)
-
-
-
-# things improved upon from (06/03/26)
-
-# - Implemented @st.cache_data from streamlit to remove unnecesarily computation when re-running streamlit wesbite. 
-# - Removed relevant.csv because it is unnecessary and increased preprocessing time compared to when removed
-# - Implemented time library for calculating execution time of pipeline components e.g (preprocessing speed)
