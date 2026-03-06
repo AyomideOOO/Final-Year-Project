@@ -1,2 +1,3 @@
-postings.csv
-relevant_fields.csv
+Data/postings.csv
+Data/relevant.csv
+.vscode/settings.json
