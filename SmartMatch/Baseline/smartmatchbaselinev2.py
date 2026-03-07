@@ -30,6 +30,9 @@ import streamlit as st
 import pdfplumber
 
 
+from docx import Document
+
+
 class SmartMatchBaseline:
 
     # Constructor: initializes the SmartMatchBaseline object
@@ -109,10 +112,11 @@ class SmartMatchBaseline:
 
         for i in range(n):
             index = k_best[i]
-            st.text(f" {i+1}) {self.df['title'][index]} \n\n {self.df['description'][index]} \n\n",)
+            st.text(f" {i+1}) {self.df['title'][index]} \nSimilarity Score: {scores[index]} \n\n {self.df['description'][index]} \n\n",)
 
         
-     
+    
+
     # next session: Use hash-map to combine indexes with their respective cosine_similarity values
     # make a graph and plot the x axis -> the cosine similarities + role names, y axis -> 0 -to 1. 
     # this would show the relationship in the similarity and why certain roles showed in top k recommendations
@@ -129,14 +133,27 @@ class SmartMatchBaseline:
 # CV is read into python as a pdf, where the text is extracted and returned. 
 
 def upload_file():
+
     text = ""
     uploaded_file = st.file_uploader("Upload your CV for personalised job recommendations", type = ['pdf', 'docx'] ) 
     if uploaded_file is not None:
-        with pdfplumber.open(uploaded_file) as pdf:
-            pages = pdf.pages[0]
-            text = pages.extract_text()
+
+
+        # checks if the 'type' of the file matches the standard for pdf files.
+        if uploaded_file.type == 'application/pdf':
+            with pdfplumber.open(uploaded_file) as pdf:
+                pages = pdf.pages[0]
+                text = pages.extract_text()
+                text = text.lower()
+
+        # checks if the 'type' of the file matches the standard for word documents
+        elif uploaded_file.type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+            document = Document(uploaded_file)
+            for p in document.paragraphs:
+                text += p.text
             text = text.lower()
-            st.success(f'Successfully Uploaded file: {uploaded_file.name}')
+
+        st.success(f'Successfully Uploaded file: {uploaded_file.name}')
         return text
 
 
