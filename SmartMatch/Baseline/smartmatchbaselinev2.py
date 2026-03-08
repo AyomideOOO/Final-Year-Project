@@ -155,7 +155,6 @@ def upload_file():
                 text += p.text
             text = text.lower()
 
-            print(text)
 
         st.success(f'Successfully Uploaded file: {uploaded_file.name}')
         return text
