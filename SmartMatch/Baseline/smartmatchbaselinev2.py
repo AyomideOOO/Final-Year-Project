@@ -128,7 +128,6 @@ class SmartMatchBaseline:
 
     
 
-
 # Function prompts user to input their CV
 # CV is read into python as a pdf, where the text is extracted and returned. 
 
@@ -142,8 +141,11 @@ def upload_file():
         # checks if the 'type' of the file matches the standard for pdf files.
         if uploaded_file.type == 'application/pdf':
             with pdfplumber.open(uploaded_file) as pdf:
-                pages = pdf.pages[0]
-                text = pages.extract_text()
+
+                # loop to extract the text from each page within the pdf
+                # if the page is empty, appends "" to the string 'text'.
+                for page in pdf.pages:
+                    text += page.extract_text() or ""
                 text = text.lower()
 
         # checks if the 'type' of the file matches the standard for word documents
@@ -152,6 +154,8 @@ def upload_file():
             for p in document.paragraphs:
                 text += p.text
             text = text.lower()
+
+            print(text)
 
         st.success(f'Successfully Uploaded file: {uploaded_file.name}')
         return text
@@ -165,7 +169,7 @@ def start_program():
     dataset = SmartMatchBaseline()
     st.title("SmartMatch")
 
-    dataset.readcsv("Data/postings.csv")
+    dataset.readcsv("SmartMatch/Data/postings.csv")
     relevant_columns = ['title', 'location', 'skills_desc', 'description']
     dataset.combine_relevant_fields(relevant_columns)
 
@@ -224,7 +228,6 @@ processing(X, dataset, 3)
 
 
 ####   End of Execution   ####
-
 
 # Things to do later (written 8/12/2025) 
 # - Measure execution time of the algorithm (done for preprocesing for performance testing on streamlit)
