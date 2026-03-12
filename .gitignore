@@ -1,3 +1,4 @@
 SmartMatch/Data/postings.csv
 .vscode/settings.json
 __pycache__/
+SmartMatch/Data/job_embeddings.npy

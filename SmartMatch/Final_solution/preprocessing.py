@@ -16,16 +16,24 @@ from docx import Document
 
 import streamlit as st
 
+# Implemented to check whether the path, to the saved job postings embeddings exists.
+import os
 
+import numpy as np
+
+# implemented for semanticly represented vectors using sentence embeddings. 
+from sentence_transformers import SentenceTransformer 
 
 class Preprocessing:
 
     def __init__(self):
+
         self.vectorizer = TfidfVectorizer()
         self.df = pd.DataFrame()
         self.X = None
         self.Y = None
         self.pf = None
+        self.model = None
 
     
     def readcsv (self, my_csv ):
@@ -39,7 +47,7 @@ class Preprocessing:
         # Create a new DataFrame 'pf' with one column 'Relevant_Fields'
         self.pf = pd.DataFrame(columns= ['Relevant_Fields'])
 
-       
+
         # Data cleaning: fillna stores NaN values as empty strings.
         # this is to prevent data loss from concatinating rows. 
 
@@ -69,13 +77,34 @@ class Preprocessing:
     
     # Sentence Embeddings Vectorization (Job-postings)
     def convert_postings_embeddings(self):
-        pass
 
-    # Sentence Embeddings Vectorization (User CV)
-    def convert_user_embeddings(self):    
-        pass
-    
-    
+        # stores location of the embedded job postings
+        file_loc = "SmartMatch\Data\job_embeddings.npy"
+
+        # loads the stored embedded job postings into X if the path to the file exists
+        if os.path.exists(file_loc):
+            self.X = np.load(file_loc)
+
+        # If the file does not exist in that path, embedds job postings and stores in file 
+        # to reduce execution time
+        else:
+
+            # checks 
+            if self.model is None:
+                self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+
+            self.X = self.model.encode(self.pf['Relevant_Fields'], show_progress_bar = True)
+            # saves the embedded job postings into binary file in NumPy format 
+            np.save(file_loc, self.X)
+
+        return self.X
+
+    # Sentence Embeddings Vectorization (User CV) 
+    # NOTE: dont need check if model is none as this step happens after.
+    def convert_user_embeddings(self,user_input):
+        self.Y = self.model.encode([user_input])
+        return self.Y
+            
     def upload_file(self):
         text = ""
         uploaded_file = st.file_uploader("Upload your CV for personalised job recommendations", type = ['pdf', 'docx'] ) 
