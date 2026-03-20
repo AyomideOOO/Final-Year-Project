@@ -45,8 +45,9 @@ class Baseline:
         # flatten converts multi-dimensional array into a 1-D array
         scores = similarity_scores.flatten()
 
-        # argsort sorts the indexes of highest values to lowest values in asending order (highest -> list[len(list-1)]) 
+        # argsort sorts the indexes of highest values to lowest values in asending order (highest -> list[-1]) 
         # (lowest -> list[0])
+        # argsort returns indexes that will sort the array in ascending order where the highest score is at the end  
 
         k_best = np.argsort(scores)[-k:][::-1]
         n = len(k_best)

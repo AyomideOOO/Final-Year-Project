@@ -34,6 +34,7 @@ class Preprocessing:
         self.Y = None
         self.pf = None
         self.model = None
+        self.uploaded_file = None
 
     
     def readcsv (self, my_csv ):
@@ -79,7 +80,7 @@ class Preprocessing:
     def convert_postings_embeddings(self):
 
         # stores location of the embedded job postings
-        file_loc = "SmartMatch\Data\job_embeddings.npy"
+        file_loc = "SmartMatch/Data/job_embeddings.npy"
 
         # loads the stored embedded job postings into X if the path to the file exists
         if os.path.exists(file_loc):
@@ -102,17 +103,22 @@ class Preprocessing:
     # Sentence Embeddings Vectorization (User CV) 
     # NOTE: dont need check if model is none as this step happens after.
     def convert_user_embeddings(self,user_input):
+        if self.model is None:
+            self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
         self.Y = self.model.encode([user_input])
         return self.Y
+
+
+
             
     def upload_file(self):
         text = ""
-        uploaded_file = st.file_uploader("Upload your CV for personalised job recommendations", type = ['pdf', 'docx'] ) 
-        if uploaded_file is not None:
+        self.uploaded_file = st.file_uploader("Upload your CV for personalised job recommendations", type = ['pdf', 'docx'] ) 
+        if self.uploaded_file is not None:
 
         # checks if the 'type' of the file matches the standard for pdf files.
-            if uploaded_file.type == 'application/pdf':
-                with pdfplumber.open(uploaded_file) as pdf:
+            if self.uploaded_file.type == 'application/pdf':
+                with pdfplumber.open(self.uploaded_file) as pdf:
 
                 # loop to extract the text from each page within the pdf
                 # if the page is empty, appends "" to the string 'text'.
@@ -121,17 +127,26 @@ class Preprocessing:
                     text = text.lower()
 
         # checks if the 'type' of the file matches the standard for word documents
-            elif uploaded_file.type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-                document = Document(uploaded_file)
+            elif self.uploaded_file.type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                document = Document(self.uploaded_file)
                 for p in document.paragraphs:
                     text += p.text
                 text = text.lower()
 
-            st.success(f'Successfully Uploaded file: {uploaded_file.name}')
+            st.success(f'Successfully Uploaded file: {self.uploaded_file.name}')
             return text
+        
+         # if there is no uploaded file
+        return None 
 
 
-    
+
+# Testing
+
+
+
+
+
 
 
 

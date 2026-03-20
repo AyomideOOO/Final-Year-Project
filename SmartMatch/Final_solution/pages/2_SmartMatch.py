@@ -9,7 +9,7 @@ from pathlib import Path
 
 # NOTE: parent.parent = pages (folder) -> Final_solution (folder)
 #       __file__ = current file (2_SmartMatch.py)
-#       sys.path.append(str(  )) = adds path containing preprocessing.py  so Preprocessing can be found  
+#       sys.path.append(str(  )) = adds path containing preprocessing.py so Preprocessing can be found  
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from preprocessing import Preprocessing
@@ -21,6 +21,7 @@ import time
 
 class smartmatch:
 
+    # composition
     def __init__(self, preprocessor):
         self.preprocessor = preprocessor
 
@@ -42,7 +43,8 @@ class smartmatch:
 
         for i in range(n):
             index = k_best[i]
-            st.text(f" {i+1}) {self.preprocessor.df['title'][index]} \nSimilarity Score: {scores[index]} \n\n {self.preprocessor.df['description'][index]} \n\n",)
+            st.text(f" {i+1}) {self.preprocessor.df['title'][index]} ,\nSimilarity Score: {scores[index]} \n\n {self.preprocessor.df['description'][index]} \n\n",)
+        
 
     
 # Running SmartMatch Page
@@ -83,6 +85,7 @@ def processing(X, dataset, k):
             
             # Top K job recommendations retrieved and outputted to user. 
             running.top_recommendations(k,Similarity_Scores)
+
 
     
 start = time.time()
