@@ -60,6 +60,13 @@ class Preprocessing:
         # concatenating each column value with a comma.
         for i in range(1,len(relevant_columns)):
             self.pf['Relevant_Fields'] += ", " + self.df[relevant_columns[i]].fillna('').str.lower() 
+
+    
+    # function that returns the sentence embedder model used
+    def get_model(self):
+        if self.model == None:
+            self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+        return self.model
     
     
     # TF-IDF Vectorization (Job-postings)
@@ -90,27 +97,23 @@ class Preprocessing:
         # to reduce execution time
         else:
 
-            # checks 
-            if self.model is None:
-                self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+            # gets the current model being used 
+            model = self.get_model()
 
-            self.X = self.model.encode(self.pf['Relevant_Fields'], show_progress_bar = True)
+            self.X = model.encode(self.pf['Relevant_Fields'], show_progress_bar = True)
             # saves the embedded job postings into binary file in NumPy format 
             np.save(file_loc, self.X)
-
         return self.X
 
     # Sentence Embeddings Vectorization (User CV) 
     # NOTE: dont need check if model is none as this step happens after.
     def convert_user_embeddings(self,user_input):
-        if self.model is None:
-            self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-        self.Y = self.model.encode([user_input])
+        model = self.get_model()
+        self.Y = model.encode([user_input])
         return self.Y
+    
 
-
-
-            
+    
     def upload_file(self):
         text = ""
         self.uploaded_file = st.file_uploader("Upload your CV for personalised job recommendations", type = ['pdf', 'docx'] ) 
@@ -138,10 +141,9 @@ class Preprocessing:
         
          # if there is no uploaded file
         return None 
+    
 
 
-
-# Testing
 
 
 
