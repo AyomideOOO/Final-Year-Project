@@ -48,13 +48,14 @@ class Preprocessing:
         # Create a new DataFrame 'pf' with one column 'Relevant_Fields'
         self.pf = pd.DataFrame(columns= ['Relevant_Fields'])
 
+        # Assigns the job_id associated to each role. 
+        self.pf["job_id"] = self.df["job_id"]
 
         # Data cleaning: fillna stores NaN values as empty strings.
         # this is to prevent data loss from concatinating rows. 
 
         # Store the first relevant column from 'df' into 'pf', converting text to lowercase
         self.pf['Relevant_Fields'] = self.df[relevant_columns[0]].fillna('').str.lower()
-
         
         # For loop stores the remaining relevant columns from 'df' into 'pf' 
         # concatenating each column value with a comma.
@@ -62,17 +63,28 @@ class Preprocessing:
             self.pf['Relevant_Fields'] += ", " + self.df[relevant_columns[i]].fillna('').str.lower() 
 
     
+
     # function that returns the sentence embedder model used
     def get_model(self):
         if self.model == None:
             self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
         return self.model
     
+
     
     # TF-IDF Vectorization (Job-postings)
     def convert_postings_TFIDF(self):
+
+        #file_loc = "SmartMatch/Data/job_tfidf.npy"
+
+        #if os.path.exists(file_loc):
+        #    self.X = np.load(file_loc, allow_pickle= True)
+        #else:
+
         # vectorizes the column 'Relevant_Fields' in dataframe 'pf' using TF-IDF
         self.X = self.vectorizer.fit_transform(self.pf['Relevant_Fields'])
+        
+         #   np.save(file_loc, self.X)
         return self.X
     
     
@@ -104,6 +116,7 @@ class Preprocessing:
             # saves the embedded job postings into binary file in NumPy format 
             np.save(file_loc, self.X)
         return self.X
+    
 
     # Sentence Embeddings Vectorization (User CV) 
     # NOTE: dont need check if model is none as this step happens after.
@@ -143,9 +156,22 @@ class Preprocessing:
         return None 
     
 
+#test = Preprocessing()
+#test.readcsv("SmartMatch/Data/postings.csv")
+
+#test.combine_relevant_fields(['title', 'location', 'skills_desc', 'description'])
 
 
+# testing to check whether the job_id in the original dataset (df), aligns with
+# the new dataframe pf. 
+#check = (
+#    test.df["job_id"].reset_index(drop=True) ==
+#    test.pf["job_id"].reset_index(drop=True)
+#).all()
 
+#print(check)
+
+#print(test.pf.head(5))
 
 
 

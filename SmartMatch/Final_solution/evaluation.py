@@ -10,6 +10,7 @@ from docx import Document
 
 
 # returns roles containing key words in order to make my dictionary
+
 # Law
 #print(testing.df[testing.df['title'].str.contains('Law|legal|attorney|compliance', case=False, na=False)]['title'].value_counts().head(20))
 #print("#######################################", '\n')
@@ -84,7 +85,7 @@ testing.combine_relevant_fields(['title', 'location', 'skills_desc', 'descriptio
 
 # Will store the string user_cv 
 text = " "
-cv = "Brandon_cv.docx"
+cv = "CV1.docx"
 
 if  cv.endswith(".pdf"):
     with pdfplumber.open(f'SmartMatch/Sample_cvs/{cv}') as pdf:

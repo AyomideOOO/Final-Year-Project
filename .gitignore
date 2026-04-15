@@ -3,3 +3,7 @@ SmartMatch/Data/postings.csv
 __pycache__/
 SmartMatch/Data/job_embeddings.npy
 SmartMatch/Sample_cvs
+SmartMatch/Data/Resume.csv
+SmartMatch/Data/job_industries.csv
+SmartMatch/Data/industries.csv
+SmartMatch/Data/job_tfidf.npy
