@@ -57,7 +57,6 @@ def start_program():
     st.title("SmartMatch System")
 
     dataset.readcsv("SmartMatch/Data/postings.csv")
-    dataset.df = dataset.df.head(20000)
     relevant_columns = ['title', 'location', 'skills_desc', 'description']
     dataset.combine_relevant_fields(relevant_columns)
     X = dataset.convert_postings_embeddings()
