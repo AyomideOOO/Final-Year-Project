@@ -394,7 +394,7 @@ class Evaluation:
         average_precision = sum(all_precisions) / len(all_precisions)
         print(f"The Overall precision:{average_precision * 100}%")
 
-    # Exploratory evaluation framework (proxy-based sector labelling using manually defined mappings
+    # Exploratory evaluation framework (proxy-based sector labelling using manually defined mappings)
     def run_tfidf(self):
 
         # stores the sector names and values in seperate lists.
@@ -497,7 +497,7 @@ class Evaluation:
 
         return all_precisions, (average_precision)
     
-    # Exploratory evaluation framework (proxy-based sector labelling using manually defined mappings
+    # Exploratory evaluation framework (proxy-based sector labelling using manually defined mappings)
     def run_embeddings(self):
 
         # stores the sector names and values in seperate lists.
