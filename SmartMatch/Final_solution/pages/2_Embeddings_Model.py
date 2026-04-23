@@ -14,10 +14,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from preprocessing import Preprocessing
 from sklearn.metrics.pairwise import cosine_similarity
-from sentence_transformers import SentenceTransformer
 import streamlit as st
 import numpy as np
 import time
+
 
 class smartmatch:
 
@@ -43,19 +43,39 @@ class smartmatch:
 
         for i in range(n):
             index = k_best[i]
-            st.text(f" {i+1}) {self.preprocessor.df['title'][index]} ,\nSimilarity Score: {scores[index]} \n\n {self.preprocessor.df['description'][index]} \n\n",)
-        
+
+            # returns the relevant information based on each role returned: Job title, Similarity Score, and description
+            title = self.preprocessor.df['title'][index]
+            score = scores[index]
+            desc = self.preprocessor.df['description'][index]
+
+            # Short preview (first 200 characters)
+            short_desc = desc[:200] + "..."
+
+            st.write(f"**{i+1}) {title}**")
+            st.write(f"Similarity Score: {score:.4f}")
+            st.write(short_desc)
+
+            # Expandable full description
+            with st.expander("See full description"):
+                st.write(desc)
+
+            st.write("-" * 50)
 
     
-# Running SmartMatch Page
+# Running Embeddings Page
+st.set_page_config(page_title="Embeddings Model")
+st.title("Sentence Embeddings Model")
+st.subheader("Model: all-MiniLM-L6-v2")
+
+
 
 # Caches preprocessing (data loading, feature extraction, TF-IDF fitting) to
 # avoid recomputation, reducing execution time. 
 @st.cache_resource
 def start_program():
-    dataset = Preprocessing()
-    st.title("SmartMatch System")
 
+    dataset = Preprocessing()
     dataset.readcsv("SmartMatch/Data/postings.csv")
     relevant_columns = ['title', 'location', 'skills_desc', 'description']
     dataset.combine_relevant_fields(relevant_columns)
@@ -86,16 +106,20 @@ def processing(X, dataset, k):
             running.top_recommendations(k,Similarity_Scores)
 
 
-    
+
+# Runtime computation
+# time taken at different components of the pipeline
 start = time.time()
 X, dataset = start_program()
-end = time.time()
+end_precomputation = time.time()
 
-total_time = end - start
-print("Page Load/Reload :",total_time)
-processing(X,dataset, 3)
+processing(X,dataset, 5)
+end_computation = time.time()
+ 
 
-    
-
+print("Preprocessing time: :", end_precomputation - start)
+print("Retrieval time:", end_computation - end_precomputation)
+print("Total runtime: ", end_computation - start)
+print("-" * 50)
     
 
