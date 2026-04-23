@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib
 
 # TkAgg is a Matplotlib backend which renders my plots using 
-# a GUI window i can interact with
+# a GUI window can be interacted with
 matplotlib.use('TkAgg')
 
 import matplotlib.pyplot as plt

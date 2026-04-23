@@ -24,6 +24,12 @@ import numpy as np
 # implemented for semanticly represented vectors using sentence embeddings. 
 from sentence_transformers import SentenceTransformer 
 
+# Used for efficient storage and loading of TF-IDF sparse matrices, to reduce recomputation time
+from scipy import sparse
+
+# Used to store the vectorizer, to reduce recomputation time
+import joblib
+
 class Preprocessing:
 
     def __init__(self):
@@ -72,19 +78,38 @@ class Preprocessing:
     
 
     
-    # TF-IDF Vectorization (Job-postings)
+    # TF-IDF Vectorisation (Job-postings)
     def convert_postings_TFIDF(self):
 
-        #file_loc = "SmartMatch/Data/job_tfidf.npy"
+        # file path where the precomputed TF-IDF matrix is stored
+        matrix_path = "SmartMatch/Data/job_tfidf.npz"
 
-        #if os.path.exists(file_loc):
-        #    self.X = np.load(file_loc, allow_pickle= True)
-        #else:
+        # file path where the precomputed vectorizer is stored
+        vectorizer_path = "SmartMatch/Data/tfidf_vectorizer.pkl"
 
-        # vectorizes the column 'Relevant_Fields' in dataframe 'pf' using TF-IDF
-        self.X = self.vectorizer.fit_transform(self.pf['Relevant_Fields'])
+        # if file exists, load the saved TF-IDF matrix instead of recomputing it
+        if os.path.exists(matrix_path) and os.path.exists(vectorizer_path):
+
+            # load stored sparse matrix (job postings already vectorised)
+            self.X = sparse.load_npz(matrix_path)
+
+            # load the vectorizer
+            self.vectorizer = joblib.load(vectorizer_path)
+
         
-         #   np.save(file_loc, self.X)
+        # If the file does not exist in that path, job postings is vectorised and stored in file 
+        # to reduce execution time
+        else:
+
+            # fit TF-IDF on job postings and convert text into vectors
+            self.X = self.vectorizer.fit_transform(self.pf['Relevant_Fields'])
+
+            # save the resulting sparse matrix to avoid recomputating next time
+            sparse.save_npz(matrix_path, self.X)
+
+            # saves the resulting vectorizer to avoid recomputating next time
+            joblib.dump(self.vectorizer, vectorizer_path)
+
         return self.X
     
     
@@ -99,13 +124,13 @@ class Preprocessing:
     def convert_postings_embeddings(self):
 
         # stores location of the embedded job postings
-        file_loc = "SmartMatch/Data/job_embeddings.npy"
+        embeddings_path = "SmartMatch/Data/job_embeddings.npy"
 
         # loads the stored embedded job postings into X if the path to the file exists
-        if os.path.exists(file_loc):
-            self.X = np.load(file_loc)
+        if os.path.exists(embeddings_path):
+            self.X = np.load(embeddings_path)
 
-        # If the file does not exist in that path, embedds job postings and stores in file 
+        # If the file does not exist in that path, job postings is embedded and stored in file 
         # to reduce execution time
         else:
 
@@ -114,7 +139,7 @@ class Preprocessing:
 
             self.X = model.encode(self.pf['Relevant_Fields'], show_progress_bar = True)
             # saves the embedded job postings into binary file in NumPy format 
-            np.save(file_loc, self.X)
+            np.save(embeddings_path, self.X)
         return self.X
     
 

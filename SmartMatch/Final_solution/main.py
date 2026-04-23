@@ -1,12 +1,18 @@
 import streamlit as st
-# Landing Page Inital Content 
 
-st.title("SmartMatch")
-st.write("Welcome to SmartMatch — an AI-driven job recommendation system.")
-st.write("Select a page from the sidebar to get started.")
+# Renames the tab page name
+st.set_page_config(page_title="Overview")
+st.title("SmartMatch Overview")
 
+# text information for page
+st.write(
+    "SmartMatch is a comparative job recommendation system that evaluates two retrieval approaches: "
+    "a TF-IDF based lexical model and a sentence embedding based semantic model."
+)
 
-# Navigation Panel 
-pg = st.navigation([st.Page("pages/1_SmartMatchBaseline.py", title = "Baseline"), st.Page("pages/2_SmartMatch.py", title = "SmartMatch")])
-pg.run()
+st.write(
+    "Each approach is implemented as a separate retrieval pipeline, allowing comparison of how "
+    "different text representation methods influence job ranking results."
+)
 
+st.write("Use the sidebar to navigate between the two retrieval systems.")
