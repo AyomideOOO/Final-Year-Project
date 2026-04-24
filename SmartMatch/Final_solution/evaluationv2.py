@@ -31,7 +31,9 @@ class Evaluation:
         self.preprocessor.readcsv("SmartMatch/Data/postings.csv")
         self.preprocessor.combine_relevant_fields(['title', 'location', 'skills_desc', 'description'])
         self.resume_df = None
-        self.job_industries_df = None
+
+        # Exploratory evaluation framework (industry-to-category semantic mapping using embedding similarity as proxy labels)
+        # self.job_industries_df = None
 
 
     def get_recommended_roles(self,k_best):
@@ -47,8 +49,8 @@ class Evaluation:
 
         return recommended_job_ids, recommended_titles
     
-
-      # Implemented to create a lookup table, mapping job_id to industry_name for each role
+    
+    # Exploratory evaluation framework (industry-to-category semantic mapping using embedding similarity as proxy labels)
     def jobid_industry_dataset(self, file_loc):
 
         # Stores job_industries.csv as a dataframe
@@ -84,8 +86,9 @@ class Evaluation:
     
 
      # Implemented to load the resume CV into a dataframe, clean the dataset etc.
-    def cv_dataset(self, file_loc):
+    
 
+    def cv_dataset(self, file_loc):
 
         # store dataset as df
         self.resume_df = pd.read_csv(file_loc)
@@ -109,7 +112,6 @@ class Evaluation:
         new_df = new_df.reset_index(drop=True)
 
         return new_df
-    
     
     # Works out the overlap@k of roles per cv between both model
     def overlap_at_k(self,tfidf, embeddings,k):
@@ -142,7 +144,7 @@ class Evaluation:
 
     # Evaluating both TF-IDF and Sentence Embeddings models
     # in a single function using: Top-K Overlap (Overlap@K), Jaccard Similarity
-    # and Rank correlation (still deciding if worth)
+
     def evaluate_models(self, cv_data, k):
 
         # each index contains results per inputted CV

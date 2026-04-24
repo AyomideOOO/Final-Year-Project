@@ -21,7 +21,7 @@ import time
 
 class smartmatch:
 
-    # composition
+    # aggregation
     def __init__(self, preprocessor):
         self.preprocessor = preprocessor
 

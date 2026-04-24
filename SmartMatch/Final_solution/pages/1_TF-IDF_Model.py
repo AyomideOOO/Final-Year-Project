@@ -29,7 +29,7 @@ from preprocessing import Preprocessing
 
 
 class Baseline:
-    # Using composition to access methods / variables unique to preprocessing class
+    # Using aggregation to access methods / variables unique to preprocessing class
     def __init__(self, preprocessor):
         self.preprocessor = preprocessor
 
@@ -74,16 +74,6 @@ class Baseline:
 
             st.write("-" * 50)
             
-
-    # next session: Use hash-map to combine indexes with their respective cosine_similarity values
-    # make a graph and plot the x axis -> the cosine similarities + role names, y axis -> 0 -to 1. 
-    # this would show the relationship in the similarity and why certain roles showed in top k recommendations
-
-    def graph_representation(self,k):
-        similarity_score = self.similarity_score().flatten()
-        best = np.sort(similarity_score)[-k:][::-1]
-        print(best)
-
 
 # Running TF-IDF Page
 st.set_page_config(page_title="TF-IDF Baseline")
