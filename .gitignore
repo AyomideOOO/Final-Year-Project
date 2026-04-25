@@ -1,13 +1,10 @@
 # Stores files that will only exist locally due to their size which 
 # can affect git pushing 
-
-SmartMatch/Data/postings.csv
 __pycache__/
+SmartMatch/Data/postings.csv
 SmartMatch/Data/job_embeddings.npy
 SmartMatch/Sample_cvs
 SmartMatch/Data/Resume.csv
-SmartMatch/Data/job_industries.csv
-SmartMatch/Data/industries.csv
 SmartMatch/Data/job_tfidf.npy
 SmartMatch/Data/job_tfidf.npz
 SmartMatch/Data/tfidf_vectorizer.pkl
