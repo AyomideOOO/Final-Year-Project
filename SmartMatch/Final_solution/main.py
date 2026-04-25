@@ -4,7 +4,7 @@ import streamlit as st
 st.set_page_config(page_title="Overview")
 st.title("SmartMatch Overview")
 
-# text information for page
+# Returns descriptive text about Smartmatch to the overview page
 st.write(
     "SmartMatch is a comparative job recommendation system that evaluates two retrieval approaches: "
     "a TF-IDF based lexical model and a sentence embedding based semantic model."

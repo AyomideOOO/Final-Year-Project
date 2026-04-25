@@ -16,9 +16,6 @@ import numpy as np
 # relevant fields and the user input (vectorized)
 from sklearn.metrics.pairwise import cosine_similarity
 
-# matplotlib used for plotting graphs to visualise similarity scores and role names
-import matplotlib.pyplot as plt
-
 # time used for working out run-time
 import time 
 

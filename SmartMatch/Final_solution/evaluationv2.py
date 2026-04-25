@@ -1,8 +1,7 @@
-# Evaluation class where firstly i will be doing semantic classification to find the correcttly classified roles returned
-# that also represent the same sector as the user cv
+# Evaluation class implementing Jaccard Similarity and Top-K Overlap
+# to compare retrieval behaviour between TF-IDF and Sentence Embeddings models
 
 from preprocessing import Preprocessing
-import pandas as pd
 import pdfplumber 
 from sklearn.metrics.pairwise import cosine_similarity
 from docx import Document
@@ -19,6 +18,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 import pandas as pd
+
 # displays dataframe information at full / not cut off (using for testing)
 pd.set_option('display.max_colwidth', None)
 
@@ -49,43 +49,8 @@ class Evaluation:
 
         return recommended_job_ids, recommended_titles
     
-    
-    # Exploratory evaluation framework (industry-to-category semantic mapping using embedding similarity as proxy labels)
-    def jobid_industry_dataset(self, file_loc):
 
-        # Stores job_industries.csv as a dataframe
-        self.job_industries_df = pd.read_csv(file_loc)
-
-        # Stores industries.csv as a dataframe
-        industries = pd.read_csv("SmartMatch/Data/industries.csv")
-
-        # drop missing values
-        self.job_industries_df.dropna(inplace= True)
-
-        # drop missing values from industries dataset
-        industries.dropna(inplace = True)
-
-        # convert values to lower case
-        industries["industry_name"] =  industries["industry_name"].str.lower()
-
-        # merge datasets on the industry id.
-        job_industry_dataset = pd.merge(self.job_industries_df, industries, on='industry_id') 
-
-        ###   filter job_ids so only the ones in pf remain   ###
-
-        # Stores a set of all job_ids in pf
-        valid_jobs = set(self.preprocessor.pf['job_id'])
-
-        # Mask to check which job id in job_industry_dataset is in dataset pf
-        mask = job_industry_dataset["job_id"].isin(valid_jobs)
-        
-        # Apply mask to job_industry dataset so relevant job_ids remain
-        job_industry_dataset = job_industry_dataset[mask]
-
-        return job_industry_dataset
-    
-
-     # Implemented to load the resume CV into a dataframe, clean the dataset etc.
+    # Implemented to load the resume CV into a dataframe, clean the dataset etc.
     def cv_dataset(self, file_loc):
 
         # store dataset as df
@@ -159,7 +124,7 @@ class Evaluation:
         # Instantiate embeddings model
         model = self.preprocessor.get_model()
 
-        # Vectorize CV dataset for TF-IDF and Embeddings
+        # For each CV, vectorize, compute similarity and evaluate model agreement
         for i in range(len(cv_data)):
 
             # get the current CV observation
@@ -190,9 +155,9 @@ class Evaluation:
             kbest_tfidf = np.argsort(tfidf_scores)[-k:][::-1]
             kbest_embeddings = np.argsort(embeddings_scores)[-k:][::-1]
 
-            # Retrieve job_ids for top k results 
-            tfidf_ids = self.get_recommended_roles(kbest_tfidf)
-            embeddings_ids = self.get_recommended_roles(kbest_embeddings)
+            # Retrieve job_ids and titles for top k results 
+            tfidf_ids, tfidf_titles = self.get_recommended_roles(kbest_tfidf)
+            embeddings_ids, embeddings_titles = self.get_recommended_roles(kbest_embeddings)
 
             # evaluation #
 
@@ -250,6 +215,41 @@ class Evaluation:
 
 
 
+
+
+    # Exploratory evaluation framework (industry-to-category semantic mapping using embedding similarity as proxy labels)
+    def jobid_industry_dataset(self, file_loc):
+
+        # Stores job_industries.csv as a dataframe
+        self.job_industries_df = pd.read_csv(file_loc)
+
+        # Stores industries.csv as a dataframe
+        industries = pd.read_csv("SmartMatch/Data/industries.csv")
+
+        # drop missing values
+        self.job_industries_df.dropna(inplace= True)
+
+        # drop missing values from industries dataset
+        industries.dropna(inplace = True)
+
+        # convert values to lower case
+        industries["industry_name"] =  industries["industry_name"].str.lower()
+
+        # merge datasets on the industry id.
+        job_industry_dataset = pd.merge(self.job_industries_df, industries, on='industry_id') 
+
+        ###   filter job_ids so only the ones in pf remain   ###
+
+        # Stores a set of all job_ids in pf
+        valid_jobs = set(self.preprocessor.pf['job_id'])
+
+        # Mask to check which job id in job_industry_dataset is in dataset pf
+        mask = job_industry_dataset["job_id"].isin(valid_jobs)
+        
+        # Apply mask to job_industry dataset so relevant job_ids remain
+        job_industry_dataset = job_industry_dataset[mask]
+
+        return job_industry_dataset
 
     # Exploratory evaluation framework (proxy-based sector labelling using manually defined mappings)
     def cv_sector_dict(self):

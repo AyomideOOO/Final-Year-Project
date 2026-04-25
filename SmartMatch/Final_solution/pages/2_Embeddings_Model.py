@@ -19,9 +19,9 @@ import numpy as np
 import time
 
 
-class smartmatch:
+class SmartMatch:
 
-    # aggregation
+    # Using aggregation to access methods / variables unique to preprocessing class
     def __init__(self, preprocessor):
         self.preprocessor = preprocessor
 
@@ -89,7 +89,7 @@ def start_program():
 def processing(X, dataset, k):
         
         # instance of smartmatch class 
-        running = smartmatch(dataset)
+        running = SmartMatch(dataset)
 
         # Store cv data in user_cv
         user_cv = dataset.upload_file()
@@ -97,7 +97,7 @@ def processing(X, dataset, k):
         # Processing can continue if the user uploads their CV. 
         if user_cv is not None:
 
-            # Vectorize the user cv using TF-IDF
+            # Vectorize the user cv using sentence embeddings
             Y = dataset.convert_user_embeddings(user_cv)
 
             # Similarity scores between user query and job postings computed using cosine similarity
