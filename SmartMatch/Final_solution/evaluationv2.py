@@ -86,8 +86,6 @@ class Evaluation:
     
 
      # Implemented to load the resume CV into a dataframe, clean the dataset etc.
-    
-
     def cv_dataset(self, file_loc):
 
         # store dataset as df
@@ -144,7 +142,6 @@ class Evaluation:
 
     # Evaluating both TF-IDF and Sentence Embeddings models
     # in a single function using: Top-K Overlap (Overlap@K), Jaccard Similarity
-
     def evaluate_models(self, cv_data, k):
 
         # each index contains results per inputted CV
@@ -183,16 +180,19 @@ class Evaluation:
             tfidf_similarity = cosine_similarity(X_tfidf, Y_tfidf)
             embeddings_similarity = cosine_similarity(X_embeddings, Y_embeddings)
 
+            # 2-D matrices flattened to 1-D array for easier processing
             tfidf_scores = tfidf_similarity.flatten()
             embeddings_scores = embeddings_similarity.flatten()
 
+            # argsort returns indices that sort scores in ascending order (lowest → highest)
+            # [-k:] slices the last K indices (highest scoring) 
+            # [::-1] reverses to descending order
             kbest_tfidf = np.argsort(tfidf_scores)[-k:][::-1]
-
             kbest_embeddings = np.argsort(embeddings_scores)[-k:][::-1]
 
-            # Retrieve job_ids and job titles for top k results 
-            tfidf_ids, tfidf_titles = self.get_recommended_roles(kbest_tfidf)
-            embeddings_ids, embeddings_titles = self.get_recommended_roles(kbest_embeddings)
+            # Retrieve job_ids for top k results 
+            tfidf_ids = self.get_recommended_roles(kbest_tfidf)
+            embeddings_ids = self.get_recommended_roles(kbest_embeddings)
 
             # evaluation #
 
@@ -208,9 +208,11 @@ class Evaluation:
 
         # mean overlap across all CVs
         mean_overlap = sum(overlap_results) / len(overlap_results)
+
+        # mean Jaccard similarity across all CVs
         mean_jaccard = sum(jaccard_results) / len(jaccard_results)
 
-        return mean_overlap, mean_jaccard
+        return mean_jaccard, mean_overlap 
     
     def mean_jaccard_graph(self, k_values, jaccard_means):
 
@@ -667,9 +669,6 @@ class Evaluation:
 
 # testing
 eval = Evaluation()
-
-# industry cv
-lookup_table = eval.jobid_industry_dataset("SmartMatch/Data/job_industries.csv")
 
 # cv dataset
 cv_data = eval.cv_dataset("SmartMatch/Data/Resume.csv")

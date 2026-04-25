@@ -96,7 +96,6 @@ class Preprocessing:
             # load the vectorizer
             self.vectorizer = joblib.load(vectorizer_path)
 
-        
         # If the file does not exist in that path, job postings is vectorised and stored in file 
         # to reduce execution time
         else:
@@ -123,7 +122,7 @@ class Preprocessing:
     # Sentence Embeddings Vectorization (Job-postings)
     def convert_postings_embeddings(self):
 
-        # stores location of the embedded job postings
+        # stores location of the precomputed embedded job postings
         embeddings_path = "SmartMatch/Data/job_embeddings.npy"
 
         # loads the stored embedded job postings into X if the path to the file exists
@@ -137,7 +136,9 @@ class Preprocessing:
             # gets the current model being used 
             model = self.get_model()
 
+            # model encodes the job postings converting it to a dense matrix
             self.X = model.encode(self.pf['Relevant_Fields'], show_progress_bar = True)
+
             # saves the embedded job postings into binary file in NumPy format 
             np.save(embeddings_path, self.X)
         return self.X
